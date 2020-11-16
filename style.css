@@ -40,6 +40,8 @@ figure .image img {
   display: flex;
   align-items: center;
   height: 60px;
+  background-color: transparent;
+  border: none;
 }
 
 .dropdown-item img {

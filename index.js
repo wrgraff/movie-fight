@@ -1,3 +1,5 @@
+const apiKey = 'e247c6a0';
+
 const root = document.querySelector('.autocomplete');
 root.innerHTML = `
     <label>
@@ -12,14 +14,14 @@ root.innerHTML = `
     </div>
 `;
 
-const input = document.querySelector('.input');
-const dropdown = document.querySelector('.dropdown');
-const resultsWrapper = document.querySelector('.results');
+const input = root.querySelector('.input');
+const dropdown = root.querySelector('.dropdown');
+const resultsWrapper = root.querySelector('.results');
 
 const fetchData = async term => {
     const response = await axios.get('http://www.omdbapi.com/', {
         params: {
-            apikey: 'e247c6a0',
+            apikey: apiKey,
             s: term
         }
     });
@@ -46,11 +48,17 @@ const onInput = debounce(async evt => {
         const imageSrc = movie.Poster === 'N/A' ? '' : movie.Poster;
 
         option.innerHTML = `
-            <a class="dropdown-item">
+            <button type="button" class="dropdown-item">
                 <img src="${imageSrc}">
                 <p>${movie.Title}</p>
-            </a>
+            </button>
         `;
+        const button = option.querySelector('.dropdown-item');
+        button.addEventListener('click', () => {
+            input.value = movie.Title;
+            dropdown.classList.remove('is-active');
+            onMovieSelect(movie);
+        });
 
         resultsWrapper.appendChild(option);
     };
@@ -62,3 +70,12 @@ document.addEventListener('click', evt => {
         dropdown.classList.remove('is-active');
     };
 });
+
+const onMovieSelect = async movie => {
+    const response = await axios.get('http://www.omdbapi.com/', {
+        params: {
+            apikey: apiKey,
+            i: movie.imdbID
+        }
+    });
+};
