@@ -1,22 +1,4 @@
-const input = document.querySelector('input');
-input.addEventListener('input', debounce(onInput));
-
-function onInput(evt) {
-    fetchData(evt.target.value);
-};
-
-async function fetchData(term) {
-    const response = await axios.get('http://www.omdbapi.com/', {
-        params: {
-            apikey: 'e247c6a0',
-            s: term
-        }
-    });
-
-    console.log(response.data);
-};
-
-function debounce(func, delay = 500) {
+const debounce = (func, delay = 500) => {
     let timeoutId;
     return (...args) => {
         if (timeoutId) {
@@ -27,3 +9,21 @@ function debounce(func, delay = 500) {
         }, delay);
     };
 };
+
+const fetchData = async term => {
+    const response = await axios.get('http://www.omdbapi.com/', {
+        params: {
+            apikey: 'e247c6a0',
+            s: term
+        }
+    });
+
+    console.log(response.data);
+};
+
+const onInput = debounce(evt => {
+    fetchData(evt.target.value);
+});
+
+const input = document.querySelector('input');
+input.addEventListener('input', onInput);
