@@ -1,3 +1,21 @@
+const root = document.querySelector('.autocomplete');
+root.innerHTML = `
+    <label>
+        <b>Search for a movie</b>
+        <input class="input" />
+    </label>
+    <div class="dropdown">
+        <div class="dropdown-menu">
+            <ul class="dropdown-content results">
+            </ul>
+        </div>
+    </div>
+`;
+
+const input = document.querySelector('.input');
+const dropdown = document.querySelector('.dropdown');
+const resultsWrapper = document.querySelector('.results');
+
 const fetchData = async term => {
     const response = await axios.get('http://www.omdbapi.com/', {
         params: {
@@ -15,18 +33,32 @@ const fetchData = async term => {
 
 const onInput = debounce(async evt => {
     const movies = await fetchData(evt.target.value);
+    if (!movies.length) {
+        dropdown.classList.remove('is-active');
+        return;
+    };
+
+    dropdown.classList.add('is-active');
+    resultsWrapper.innerHTML = '';
 
     for (let movie of movies) {
-        const div = document.createElement('div');
+        const option = document.createElement('li');
+        const imageSrc = movie.Poster === 'N/A' ? '' : movie.Poster;
 
-        div.innerHTML = `
-            <img src="${movie.Poster}">
-            <h1>${movie.Title}</h1>
+        option.innerHTML = `
+            <a class="dropdown-item">
+                <img src="${imageSrc}">
+                <p>${movie.Title}</p>
+            </a>
         `;
 
-        document.querySelector('#target').appendChild(div);
+        resultsWrapper.appendChild(option);
     };
 });
-
-const input = document.querySelector('input');
 input.addEventListener('input', onInput);
+
+document.addEventListener('click', evt => {
+    if (!root.contains(evt.target)) {
+        dropdown.classList.remove('is-active');
+    };
+});
