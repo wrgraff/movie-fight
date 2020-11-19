@@ -1,7 +1,13 @@
-const createAutocomplete = ({ root, renderOption, onOptionSelect, inputValue }) => {
+const createAutocomplete = ({
+    root,
+    renderOption,
+    onOptionSelect,
+    inputValue,
+    fetchData
+}) => {
     root.innerHTML = `
         <label>
-            <b>Search for a movie</b>
+            <b>Search</b>
             <input class="input" />
         </label>
         <div class="dropdown">
@@ -17,8 +23,8 @@ const createAutocomplete = ({ root, renderOption, onOptionSelect, inputValue }) 
     const resultsWrapper = root.querySelector('.results');
        
     const onInput = debounce(async evt => {
-        const movies = await fetchData(evt.target.value);
-        if (!movies.length) {
+        const items = await fetchData(evt.target.value);
+        if (!items.length) {
             dropdown.classList.remove('is-active');
             return;
         };
@@ -26,15 +32,15 @@ const createAutocomplete = ({ root, renderOption, onOptionSelect, inputValue }) 
         dropdown.classList.add('is-active');
         resultsWrapper.innerHTML = '';
     
-        for (let movie of movies) {
+        for (let item of items) {
             const option = document.createElement('li');
     
-            option.innerHTML = `<button type="button" class="dropdown-item">${renderOption(movie)}</button>`;
+            option.innerHTML = `<button type="button" class="dropdown-item">${renderOption(item)}</button>`;
             const button = option.querySelector('.dropdown-item');
             button.addEventListener('click', () => {
-                input.value = inputValue(movie);
+                input.value = inputValue(item);
                 dropdown.classList.remove('is-active');
-                onOptionSelect(movie);
+                onOptionSelect(item);
             });
     
             resultsWrapper.appendChild(option);
